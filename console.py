@@ -4,6 +4,8 @@ import cmd
 import sys
 import re
 import os
+import shlex
+import ast
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
