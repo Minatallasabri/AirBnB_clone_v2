@@ -3,7 +3,7 @@
 import json
 from models.base_model import BaseModel
 from models.user import User
-from models.place import Place 
+from models.place import Place
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
@@ -52,21 +52,20 @@ class FileStorage:
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                        self.all()[key] = classes[val['__class__']](**val)
+                    self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
 
     def delete(self, obj=None):
-       """
-       delete object 
-       """
-       if obj is None:
-           return
-       obj_delete = f"{obj.__class__.__name__}.{obj.id}"
-
-       try:
-           del FileStorage.__objects[obj_delete]
-       except AttributeError:
-           pass
-       except KeyboardInterrupt:
-           pass
+        """
+        delete object
+        """
+        if obj is None:
+            return
+        obj_delete = f"{obj.__class__.__name__}.{obj.id}"
+        try:
+            del FileStorage.__objects[obj_delete]
+        except AttributeError:
+            pass
+        except KeyboardInterrupt:
+            pass
