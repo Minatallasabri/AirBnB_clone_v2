@@ -57,16 +57,15 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-       """
-       delete object 
-       """
-       if obj is None:
-           return
-       obj_delete = f"{obj.__class__.__name__}.{obj.id}"
-
-       try:
-           del FileStorage.__objects[obj_delete]
-       except AttributeError:
-           pass
-       except KeyboardInterrupt:
-           pass
+        """
+        delete object
+        """
+        if obj is None:
+            return
+        obj_delete = f"{obj.__class__.__name__}.{obj.id}"
+        try:
+            del FileStorage.__objects[obj_delete]
+        except AttributeError:
+            pass
+        except KeyboardInterrupt:
+            pass
