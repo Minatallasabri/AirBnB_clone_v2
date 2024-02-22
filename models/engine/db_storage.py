@@ -1,48 +1,62 @@
 #!/usr/bin/python3
-"""New engine DBStorage"""
-from sqlalchemy import create_engine
-from sqlalchemy import MetaData
+""" new class for sqlAlchemy """
+from os import getenv
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import BaseModel, Base
+from sqlalchemy import (create_engine)
+from sqlalchemy.ext.declarative import declarative_base
+from models.base_model import Base
 from models.state import State
 from models.city import City
 from models.user import User
 from models.place import Place
 from models.review import Review
 from models.amenity import Amenity
-import os
 
 
 class DBStorage:
-    """ create tables in environment"""
+    """ create tables in environmental"""
     __engine = None
     __session = None
 
     def __init__(self):
-        '''
-        Defines DBStorage class instances
-        '''
-        self.__engine = create_engine("mysql+mysqldb://{}:{}@{}/{}".format(
-            os.getenv("HBNB_MYSQL_USER"), os.getenv("HBNB_MYSQL_PWD"),
-            os.getenv("HBNB_MYSQL_HOST"), os.getenv("HBNB_MYSQL_DB")),
-            pool_pre_ping=True)
-        if os.getenv("HBNB_ENV") == "test":
-            Base.metadata.drop_all(bind=self.__engine)
+        '''instantiate new dbstorage instance'''
+        HBNB_MYSQL_USER = getenv('HBNB_MYSQL_USER')
+        HBNB_MYSQL_PWD = getenv('HBNB_MYSQL_PWD')
+        HBNB_MYSQL_HOST = getenv('HBNB_MYSQL_HOST')
+        HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
+        HBNB_ENV = getenv('HBNB_ENV')
+        self.__engine = create_engine(
+            'mysql+mysqldb://{}:{}@{}/{}'.format(
+                                           HBNB_MYSQL_USER,
+                                           HBNB_MYSQL_PWD,
+                                           HBNB_MYSQL_HOST,
+                                           HBNB_MYSQL_DB
+                                       ), pool_pre_ping=True)
+
+        if HBNB_ENV == 'test':
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        '''
-        Returns dictionary of all objects in the database
-        '''
-        all_objects = {}
+        """returns a dictionary
+        Return:
+            returns a dictionary of __object
+        """
+        dic = {}
         if cls:
-            all_objects = {obj.__class__.__name__ + "." + obj.id: obj for
-                           obj in self.__session.query(eval(cls)).all()}
+            if type(cls) is str:
+                cls = eval(cls)
+            query = self.__session.query(cls)
+            for elem in query:
+                key = "{}.{}".format(type(elem).__name__, elem.id)
+                dic[key] = elem
         else:
-            for tbl in Base.__subclasses__():
-                table = self.__session.query(tbl).all()
-                for obj in table:
-                    all_objects[obj.__class__.__name__] = obj
-        return all_objects
+            lista = [State, City, User, Place, Review, Amenity]
+            for clase in lista:
+                query = self.__session.query(clase)
+                for elem in query:
+                    key = "{}.{}".format(type(elem).__name__, elem.id)
+                    dic[key] = elem
+        return (dic)
 
     def new(self, obj):
         """add a new element in the table
@@ -69,6 +83,6 @@ class DBStorage:
         self.__session = Session()
 
     def close(self):
-        """ close the working SQLAlchemy session.
+        """ calls remove()
         """
         self.__session.close()
