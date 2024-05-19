@@ -5,10 +5,12 @@ archive to the web servers
 """
 
 from datetime import datetime
-from fabric.api import *
+from fabric.api import put, run, local
+from fabric.api import env
 from os.path import exists
 env.hosts = ["54.175.222.189", "54.157.184.160"]
 env.user = "ubuntu"
+env.key_filename = '~/.ssh/id_rsa'
 
 
 def do_pack():
